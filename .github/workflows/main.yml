@@ -1,10 +1,10 @@
-name: Deploy to EC2 (crypto-analyst-ui)
+name: Manual Deploy to EC2
 
 on:
   workflow_dispatch:
     inputs:
-      server_ip:
-        description: "EC2 public IP (e.g. 18.210.23.43)"
+      EC2_IP:
+        description: "Enter EC2 IPv4 address"
         required: true
         type: string
 
@@ -13,38 +13,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ github.event.inputs.server_ip }}
-          username: ${{ secrets.EC2_SSH_USER }}   # e.g. "ubuntu"
-          key: ${{ secrets.EC2_SSH_KEY }}         # your key.pem contents
-          port: 22
-          script: |
+      - name: Create SSH key file
+        run: |
+          echo "Creating SSH key..."
+          echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
+          chmod 600 ec2_key.pem
+
+      - name: Deploy to EC2
+        run: |
+          HOST="${{ github.event.inputs.EC2_IP }}"
+          echo "Connecting to EC2 at $HOST..."
+
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$HOST "
             set -e
+            echo '--- Connected to EC2 ---'
 
-            # First-time setup: clone if missing
-            if [ ! -d "crypto-analyst-ui" ]; then
+            if [ ! -d ~/crypto-analyst-ui ]; then
               git clone https://github.com/Mmarucr7/crypto-analyst-ui.git
             fi
 
-            cd crypto-analyst-ui
+            cd ~/crypto-analyst-ui
 
-            # Pull latest code
+            echo '--- Pulling latest code ---'
             git pull
 
-            # Install deps & build
+            echo '--- Installing dependencies ---'
             npm install
+
+            echo '--- Building project ---'
             npm run build
 
-            # Start / restart app with pm2 on port 3000
-            if pm2 list | grep -q "crypto-ui"; then
-              pm2 restart crypto-ui
-            else
-              pm2 start npm --name "crypto-ui" -- start
-            fi
+            echo '--- Restarting PM2 ---'
+            pm2 restart crypto-ui || pm2 start npm --name crypto-ui -- start
 
-            pm2 save
+            echo '--- Deployment complete ---'
+          "
