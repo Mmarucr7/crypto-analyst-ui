@@ -1,0 +1,61 @@
+name: Deploy to EC2 (crypto-analyst-ui)
+
+on:
+  workflow_dispatch:
+    inputs:
+      server_ip:
+        description: "EC2 public IP (e.g. 18.210.23.43)"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Optional: CI build check before deploying
+      - name: Install & build (CI sanity check)
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ github.event.inputs.server_ip }}
+          username: ${{ secrets.EC2_SSH_USER }}   # e.g. "ubuntu"
+          key: ${{ secrets.EC2_SSH_KEY }}         # your key.pem contents
+          port: 22
+          script: |
+            set -e
+
+            # First-time setup: clone if missing
+            if [ ! -d "crypto-analyst-ui" ]; then
+              git clone https://github.com/Mmarucr7/crypto-analyst-ui.git
+            fi
+
+            cd crypto-analyst-ui
+
+            # Pull latest code
+            git pull
+
+            # Install deps & build
+            npm install
+            npm run build
+
+            # Start / restart app with pm2 on port 3000
+            if pm2 list | grep -q "crypto-ui"; then
+              pm2 restart crypto-ui
+            else
+              pm2 start npm --name "crypto-ui" -- start
+            fi
+
+            pm2 save
