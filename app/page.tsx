@@ -578,7 +578,7 @@ export default function HomePage() {
       <div
         style={{
           marginTop: '1.5rem',
-          padding: '1.2rem 1.4rem',
+          padding: '1.6rem',
           borderRadius: 16,
           border: '1px solid #1f2937',
           background:
@@ -597,7 +597,7 @@ export default function HomePage() {
         </h2>
         <p
           style={{
-            fontSize: '0.85rem',
+            fontSize: '1rem',
             color: '#9ca3af',
             marginBottom: '0.75rem',
           }}
@@ -609,9 +609,9 @@ export default function HomePage() {
 
         <div
           style={{
-            maxHeight: 260,
+            maxHeight: 380,
             overflowY: 'auto',
-            padding: '0.6rem',
+            padding: '0.85rem',
             borderRadius: 12,
             border: '1px solid #111827',
             backgroundColor: '#020617',
@@ -619,11 +619,11 @@ export default function HomePage() {
             display: 'flex',
             flexDirection: 'column',
             gap: '0.4rem',
-            fontSize: '0.9rem',
+            fontSize: '1rem',
           }}
         >
           {chatMessages.length === 0 && (
-            <div style={{ color: '#6b7280', fontSize: '0.85rem' }}>
+            <div style={{ color: '#6b7280', fontSize: '0.95rem' }}>
               Example questions: &quot;Is BTC overbought right now?&quot;, &quot;How risky is
               ETH this week?&quot;, or &quot;Explain RSI like I&apos;m new to trading.&quot;
             </div>
@@ -635,7 +635,7 @@ export default function HomePage() {
               style={{
                 alignSelf: m.sender === 'user' ? 'flex-end' : 'flex-start',
                 maxWidth: '80%',
-                padding: '0.5rem 0.75rem',
+                padding: '0.75rem 1rem',
                 borderRadius: 12,
                 background:
                   m.sender === 'user'
@@ -644,7 +644,7 @@ export default function HomePage() {
                 color: m.sender === 'user' ? '#f9fafb' : '#e5e7eb',
                 border:
                   m.sender === 'ai' ? '1px solid #1f2937' : '1px solid transparent',
-                fontSize: '0.88rem',
+                fontSize: '1rem',
                 whiteSpace: 'pre-wrap',
               }}
             >
@@ -663,7 +663,7 @@ export default function HomePage() {
                 borderRadius: 9999,
                 border: '1px solid #1f2937',
                 backgroundColor: '#020617',
-                fontSize: '0.8rem',
+                fontSize: '0.9rem',
                 color: '#9ca3af',
               }}
             >
@@ -693,12 +693,12 @@ export default function HomePage() {
             placeholder="Ask anything about crypto…"
             style={{
               flex: 1,
-              padding: '0.65rem 0.85rem',
+              padding: '0.85rem 1.1rem',
               borderRadius: 9999,
               border: '1px solid #4b5563',
               backgroundColor: '#020617',
               color: '#e5e7eb',
-              fontSize: '0.9rem',
+              fontSize: '1rem',
             }}
             disabled={chatLoading}
           />
@@ -706,7 +706,7 @@ export default function HomePage() {
             type="submit"
             disabled={chatLoading || !chatInput.trim()}
             style={{
-              padding: '0.65rem 1.2rem',
+              padding: '0.85rem 1.4rem',
               borderRadius: 9999,
               border: 'none',
               background:
@@ -714,7 +714,7 @@ export default function HomePage() {
               color: '#e5e7eb',
               cursor: chatLoading || !chatInput.trim() ? 'default' : 'pointer',
               fontWeight: 600,
-              fontSize: '0.85rem',
+              fontSize: '1rem',
               opacity: chatLoading || !chatInput.trim() ? 0.7 : 1,
             }}
           >
