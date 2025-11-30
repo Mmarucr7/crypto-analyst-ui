@@ -360,7 +360,6 @@ export default function HomePage() {
     }
     setIsAuthenticated(false);
     setAuthEmail(null);
-    setResult(null);
     setTopCoins([]);
     setSelectedSymbol(null);
     setHistory([]);
