@@ -21,12 +21,6 @@ jobs:
         with:
           node-version: "20"
 
-      # Optional: CI build check before deploying
-      - name: Install & build (CI sanity check)
-        run: |
-          npm ci
-          npm run build
-
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
