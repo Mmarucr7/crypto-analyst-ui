@@ -10,14 +10,40 @@ const AGENT_ID = process.env.BEDROCK_AGENT_ID || 'HYEOBH27GN';
 const AGENT_ALIAS_ID = process.env.BEDROCK_AGENT_ALIAS_ID || 'HKYBMPQHTH';
 
 const bedrockClient = new BedrockAgentRuntimeClient({ region: REGION });
+const lastCallPerSession = new Map<string, number>();
+let lastGlobalCall = 0;
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+async function enforceCadence(sessionId: string) {
+  const now = Date.now();
+  const SESSION_DELAY = 2000; // 2s between requests for a single chat session
+  const GLOBAL_DELAY = 800; // ~1 req/s across all sessions
+
+  const sessionLag = (lastCallPerSession.get(sessionId) || 0) + SESSION_DELAY - now;
+  const globalLag = lastGlobalCall + GLOBAL_DELAY - now;
+  const waitFor = Math.max(sessionLag, globalLag, 0);
+
+  if (waitFor > 0) {
+    await sleep(waitFor);
+  }
+
+  const timestamp = Date.now();
+  lastCallPerSession.set(sessionId, timestamp);
+  lastGlobalCall = timestamp;
+}
 
 async function callBedrockWithRetry(command: InvokeAgentCommand, maxRetries = 2) {
   let lastError: any;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       if (attempt > 0) {
-        const delay = 300 * attempt; // simple backoff: 300ms, 600ms, ...
-        await new Promise((res) => setTimeout(res, delay));
+        const base = 500 * Math.pow(2, attempt - 1); // 500ms, 1s, 2s...
+        const jitter = Math.random() * 250;
+        await sleep(base + jitter);
       }
       return await bedrockClient.send(command);
     } catch (err: any) {
@@ -55,6 +81,8 @@ export async function POST(req: NextRequest) {
         : crypto.randomUUID();
 
     console.log('➡️ Using sessionId:', effectiveSessionId);
+
+    await enforceCadence(effectiveSessionId);
 
     const command = new InvokeAgentCommand({
       agentId: AGENT_ID,
