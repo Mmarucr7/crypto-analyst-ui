@@ -762,7 +762,7 @@ export default function HomePage() {
             }}
           >
             {authMode === 'login'
-              ? 'Sign in to Crypto Analyst'
+              ? 'Sign in to Crypto AI STOCK ANALYST'
               : authMode === 'signup'
               ? 'Create your account'
               : 'Confirm your account'}
@@ -1026,7 +1026,7 @@ export default function HomePage() {
               marginBottom: '0.3rem',
             }}
           >
-            Crypto AI Financial Analyst
+            Crypto AI STOCK ANALYST
           </h1>
           <p style={{ color: '#9ca3af', fontSize: '0.9rem' }}>
             Choose a coin from the dropdown or click a top mover to see its chart and
