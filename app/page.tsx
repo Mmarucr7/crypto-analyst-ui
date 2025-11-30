@@ -1028,10 +1028,6 @@ export default function HomePage() {
           >
             Crypto AI STOCK ANALYST
           </h1>
-          <p style={{ color: '#9ca3af', fontSize: '0.9rem' }}>
-            Choose a coin from the dropdown or click a top mover to see its chart and
-            AI-powered BUY / HOLD / SELL signal.
-          </p>
         </div>
 
         <div style={{ textAlign: 'right' }}>
