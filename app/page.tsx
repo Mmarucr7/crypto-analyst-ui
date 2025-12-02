@@ -232,19 +232,45 @@ export default function HomePage() {
     setChatInput('');
     setChatLoading(true);
 
+    // Abort after timeout to avoid long hangs/HTML 504 pages
+    const controller = new AbortController();
+    const timeoutMs = 180000; // 3 minutes client-side cap
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
     try {
       const resp = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, sessionId: chatSessionId }),
+        signal: controller.signal,
       });
 
-      const data = await resp.json();
+      let parsed: any = null;
+      let rawText = '';
+      const respForText = resp.clone(); // clone to allow both JSON and text parsing
+
+      try {
+        parsed = await resp.json();
+      } catch {
+        try {
+          rawText = await respForText.text();
+        } catch {
+          rawText = '';
+        }
+      }
+
+      if (!resp.ok) {
+        const msg =
+          (parsed && (parsed.error || parsed.message)) ||
+          rawText ||
+          `Request failed with status ${resp.status}`;
+        throw new Error(msg);
+      }
 
       const replyText: string =
-        typeof data.reply === 'string'
-          ? data.reply
-          : data.error || 'Sorry, I could not get a response from the Finance Agent.';
+        typeof parsed?.reply === 'string'
+          ? parsed.reply
+          : parsed?.error || 'Sorry, I could not get a response from the Finance Agent.';
 
       setChatMessages((prev) => [
         ...prev,
@@ -254,16 +280,30 @@ export default function HomePage() {
         },
       ]);
     } catch (err: any) {
-      console.error(err);
+      console.error('Chat request failed:', err);
+      const timedOut = err?.name === 'AbortError';
+      let errorText =
+        err?.message ||
+        'Something went wrong while contacting the Finance Agent. Please try again.';
+
+      // Replace long HTML error bodies with a short hint
+      if (errorText.trim().startsWith('<')) {
+        errorText = 'Upstream returned an HTML error (likely 504). Please try again.';
+      }
+
+      if (timedOut) {
+        errorText = 'Request timed out. Please try again.';
+      }
+
       setChatMessages((prev) => [
         ...prev,
         {
           sender: 'ai',
-          text:
-            'Something went wrong while contacting the Finance Agent. Please try again.',
+          text: errorText,
         },
       ]);
     } finally {
+      clearTimeout(timeoutId);
       setChatLoading(false);
     }
   };
@@ -1137,3 +1177,4 @@ export default function HomePage() {
     </main>
   );
 }
+
