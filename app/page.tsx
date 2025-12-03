@@ -535,10 +535,6 @@ export default function HomePage() {
 
     const chartData = history.map((p) => ({
       ...p,
-      label: new Date(p.time).toLocaleTimeString(undefined, {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
     }));
 
     const niceName =
@@ -580,7 +576,15 @@ export default function HomePage() {
               </linearGradient>
             </defs>
             <XAxis
-              dataKey="label"
+              dataKey="time"
+              type="number"
+              domain={['dataMin', 'dataMax']}
+              tickFormatter={(value: number) =>
+                new Date(value).toLocaleTimeString(undefined, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              }
               tick={{ fontSize: 10, fill: '#9ca3af' }}
               minTickGap={20}
             />
