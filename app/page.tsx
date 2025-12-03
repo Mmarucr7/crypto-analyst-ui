@@ -442,7 +442,7 @@ export default function HomePage() {
             fontSize: '0.95rem',
           }}
         >
-          <span>Top Crypto (Binance US 24h)</span>
+          <span>Top Crypto </span>
           <span style={{ color: '#6b7280', fontSize: '0.75rem' }}>
             Tap a card to view chart
           </span>
@@ -600,6 +600,12 @@ export default function HomePage() {
                 fontSize: 12,
               }}
               formatter={(value: any) => [`$${Number(value).toFixed(4)}`, 'Close']}
+              labelFormatter={(value: number) =>
+                new Date(value).toLocaleTimeString(undefined, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              }
             />
             <Area
               type="monotone"
@@ -636,7 +642,7 @@ export default function HomePage() {
             marginBottom: '0.4rem',
           }}
         >
-          Chat with Finance AI
+          CryptoSight Chatbot
         </h2>
         <p
           style={{
@@ -665,13 +671,6 @@ export default function HomePage() {
             fontSize: '1rem',
           }}
         >
-          {chatMessages.length === 0 && (
-            <div style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-              Example questions: &quot;Is BTC overbought right now?&quot;, &quot;How risky is
-              ETH this week?&quot;, or &quot;Explain RSI like I&apos;m new to trading.&quot;
-            </div>
-          )}
-
           {chatMessages.map((m, idx) => (
             <div
               key={idx}
@@ -806,7 +805,7 @@ export default function HomePage() {
             }}
           >
             {authMode === 'login'
-              ? 'Sign in to Crypto AI STOCK ANALYST'
+              ? 'Sign in to CryptoSight AI'
               : authMode === 'signup'
               ? 'Create your account'
               : 'Confirm your account'}
@@ -1070,7 +1069,7 @@ export default function HomePage() {
               marginBottom: '0.3rem',
             }}
           >
-            Crypto AI STOCK ANALYST
+            CryptoSight AI
           </h1>
         </div>
 
@@ -1181,4 +1180,3 @@ export default function HomePage() {
     </main>
   );
 }
-
