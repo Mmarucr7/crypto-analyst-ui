@@ -1,8 +1,6 @@
 
 # EC2 Deployment Guide for Crypto Analyst UI (Ubuntu)
 
-This guide walks you through setting up a **new Ubuntu EC2 instance** to host your Next.js + PM2 + NGINX app.
-
 ---
 
 ## 1. Launch an EC2 Ubuntu Server
@@ -182,13 +180,5 @@ pm2 restart crypto-ui
 ```
 
 ---
-
-## 14. Optional GitHub Actions Deployment
-
-You can automate deployments through GitHub Actions if desired.
-
----
-
-## DONE 🎉
 
 Your EC2 server with Node.js, PM2, NGINX, and your Next.js app is fully operational.
